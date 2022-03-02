@@ -1,5 +1,6 @@
 package com.example.myfinanceapp.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,9 +13,9 @@ import com.example.myfinanceapp.Adapters.MainStocksAdapter
 import com.example.myfinanceapp.R
 import com.example.myfinanceapp.databinding.FragmentHomeBinding
 
-class HomeFragment : Fragment() {
 
-    lateinit var recyclerView: RecyclerView
+open class HomeFragment : Fragment() {
+
     lateinit var stocks: Array<String>
 
     private lateinit var homeViewModel: HomeViewModel
@@ -24,18 +25,12 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    @SuppressLint("ResourceAsColor")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        var rootView: View = inflater.inflate(R.layout.fragment_home, container, false)
-        recyclerView = rootView.findViewById(R.id.mainStocks)
-        stocks = resources.getStringArray(R.array.mainStocks)
-        val stockAdapter = MainStocksAdapter(this, stocks)
-        recyclerView.adapter = stockAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
 
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
@@ -43,8 +38,18 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+       recyclerViewCreator(root)
 
         return root
+    }
+
+    // Initialize and creates the recycler view
+    private fun recyclerViewCreator(root: View) {
+        stocks = resources.getStringArray(R.array.main_stocks)
+        val stockAdapter = MainStocksAdapter(requireContext(), stocks)
+        binding.rvMainStocks.adapter = stockAdapter
+        var layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvMainStocks.layoutManager = layoutManager
     }
 
     override fun onDestroyView() {
