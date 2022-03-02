@@ -1,17 +1,22 @@
 package com.example.myfinanceapp.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.myfinanceapp.Adapters.MainStocksAdapter
 import com.example.myfinanceapp.R
 import com.example.myfinanceapp.databinding.FragmentHomeBinding
 
-class HomeFragment : Fragment() {
+
+open class HomeFragment : Fragment() {
+
+    lateinit var stocks: Array<String>
 
     private lateinit var homeViewModel: HomeViewModel
     private var _binding: FragmentHomeBinding? = null
@@ -20,22 +25,31 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    @SuppressLint("ResourceAsColor")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-            textView.text = it
-        })
+       recyclerViewCreator(root)
+
         return root
+    }
+
+    // Initialize and creates the recycler view
+    private fun recyclerViewCreator(root: View) {
+        stocks = resources.getStringArray(R.array.main_stocks)
+        val stockAdapter = MainStocksAdapter(requireContext(), stocks)
+        binding.rvMainStocks.adapter = stockAdapter
+        var layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvMainStocks.layoutManager = layoutManager
     }
 
     override fun onDestroyView() {
