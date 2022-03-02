@@ -13,6 +13,9 @@ import com.example.myfinanceapp.R
 import com.example.myfinanceapp.ui.home.StockInfo
 import org.jetbrains.annotations.NotNull
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 
 
 class MainStocksAdapter(cl: Context, s1: Array<String>) :
@@ -41,21 +44,26 @@ class MainStocksAdapter(cl: Context, s1: Array<String>) :
 
         // TODO make navigation work after pressing this
         // TODO set all the views in the layout according to the data base
-        holder.stock_layout.setOnClickListener(View.OnClickListener {
-            val i = Bundle() // The object the holds the info passed the the stock_layout
-            i.putString("stock", stocks[position])
-            // Creating the mechanism to replace the home layout with the stock layout
-            val activity: AppCompatActivity = p.context as AppCompatActivity
-            // Initializing the container fragment and set the info the I want to pass
-            val myFragment: Fragment = StockInfo()
-            myFragment.arguments = i
-            // Actually activates the stock fragment
-            activity.supportFragmentManager.beginTransaction().apply {
-                replace(R.id.container, myFragment,"OptionsFragment")
-                addToBackStack(null)
-                commit()
-            }
-        })
+//        holder.stock_layout.setOnClickListener(View.OnClickListener {
+//            val i = Bundle() // The object the holds the info passed the the stock_layout
+//            i.putString("stock", stocks[position])
+//            // Creating the mechanism to replace the home layout with the stock layout
+//            val activity: AppCompatActivity = it.context as AppCompatActivity
+//            // Initializing the container fragment and set the info the I want to pass
+//            val myFragment: Fragment = StockInfo()
+//            myFragment.arguments = i
+//            // Actually activates the stock fragment
+//            val navHostFragment =
+//                activity.supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+//            val navController = navHostFragment.navController
+//            navController.navigate(R.id.fragment_stocks)
+//            activity.supportFragmentManager.beginTransaction().apply {
+//                setReorderingAllowed(true)
+//                replace(R.id.container, myFragment ,"OptionsFragment")
+//                addToBackStack(null)
+//                commit()
+//            }
+//        })
 
     }
 

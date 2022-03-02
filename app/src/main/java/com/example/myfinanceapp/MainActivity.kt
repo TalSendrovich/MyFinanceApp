@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myfinanceapp.Adapters.MainStocksAdapter
 import com.example.myfinanceapp.databinding.ActivityMainBinding
+import com.example.myfinanceapp.ui.home.HomeFragment
 import com.example.myfinanceapp.ui.home.StockInfo
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        addDynamicFragment();
 
         val navView: BottomNavigationView = binding.navView
 
@@ -38,5 +41,12 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+    }
+    private fun addDynamicFragment() {
+        // TODO Auto-generated method stub
+        // creating instance of the HelloWorldFragment.
+        val fg = HomeFragment();
+        // adding fragment to relative layout by using layout id
+        supportFragmentManager.beginTransaction().add(R.id.home, fg).commit();
     }
 }
