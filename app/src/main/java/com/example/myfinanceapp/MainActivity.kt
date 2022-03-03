@@ -1,20 +1,13 @@
 package com.example.myfinanceapp
 
-import android.content.res.Resources
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.myfinanceapp.Adapters.MainStocksAdapter
 import com.example.myfinanceapp.databinding.ActivityMainBinding
+import com.example.myfinanceapp.ui.dashboard.DashboardFragment
 import com.example.myfinanceapp.ui.home.HomeFragment
-import com.example.myfinanceapp.ui.home.StockInfo
+import com.example.myfinanceapp.ui.notifications.NotificationsFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,30 +16,40 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        addDynamicFragment();
 
-        val navView: BottomNavigationView = binding.navView
+        // Displaying the home fragment on top of the FrameLayout
+        val homeFragment = HomeFragment()
+        setCurrentFragment(homeFragment)
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-
+        // Setting the navigation Bar
+        navigationBarController()
     }
-    private fun addDynamicFragment() {
-        // TODO Auto-generated method stub
-        // creating instance of the HelloWorldFragment.
-        val fg = HomeFragment();
-        // adding fragment to relative layout by using layout id
-        supportFragmentManager.beginTransaction().add(R.id.home, fg).commit();
+
+    private fun navigationBarController(){
+        val homeFragment = HomeFragment()
+        val dashboardFragment = DashboardFragment()
+        val notificationsFragment = NotificationsFragment()
+
+        setCurrentFragment(homeFragment)
+        val navView: BottomNavigationView = binding.navView
+        navView.setOnItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_home -> setCurrentFragment(homeFragment)
+                R.id.navigation_dashboard -> setCurrentFragment(dashboardFragment)
+                R.id.navigation_notifications -> setCurrentFragment(notificationsFragment)
+
+            }
+            true
+        }
+    }
+
+    fun setCurrentFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.nav_host_fragment_activity_main, fragment, "OptionsFragment")
+            addToBackStack(null)
+            commit()
+        }
     }
 }

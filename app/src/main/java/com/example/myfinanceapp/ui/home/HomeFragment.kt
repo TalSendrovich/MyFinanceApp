@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myfinanceapp.Adapters.MainStocksAdapter
+import com.example.myfinanceapp.MainActivity
 import com.example.myfinanceapp.R
 import com.example.myfinanceapp.databinding.FragmentHomeBinding
 
@@ -40,8 +42,20 @@ open class HomeFragment : Fragment() {
 
        recyclerViewCreator(root)
 
+        if (container != null) {
+            container.removeAllViews();
+        }
+        container?.clearDisappearingChildren()
+
+        val myFragment = StockInfo()
+        binding.button.setOnClickListener {
+            val activity: AppCompatActivity = it.context as AppCompatActivity
+            (getActivity() as MainActivity?)?.setCurrentFragment(myFragment)
+        }
         return root
     }
+
+
 
     // Initialize and creates the recycler view
     private fun recyclerViewCreator(root: View) {
