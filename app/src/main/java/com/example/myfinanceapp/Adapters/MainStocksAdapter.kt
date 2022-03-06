@@ -58,15 +58,6 @@ class MainStocksAdapter(cl: Context, s1: Array<String>) :
             val myFragment: Fragment = StockInfo()
             myFragment.arguments = i
 
-          //Navigation.findNavController(it).navigate(R.id.navigateToStockInfoFragment)
-
-            // Actually activates the stock fragment
-
-//            val navHostFragment =
-//                activity.supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-//            val navController = navHostFragment.navController
-//            navController.navigate(R.id.fragment_stocks)
-
             activity.supportFragmentManager.beginTransaction().apply {
                 replace(R.id.nav_host_fragment_activity_main, myFragment ,"OptionsFragment")
                 addToBackStack(null)
@@ -74,8 +65,8 @@ class MainStocksAdapter(cl: Context, s1: Array<String>) :
             }
         })
 }
-////
-//
+
+
     override fun getItemCount(): Int {
         return stocks.size;
     }
@@ -91,5 +82,5 @@ class MainStocksAdapter(cl: Context, s1: Array<String>) :
             text_back_ground = itemView.findViewById(R.id.tv_back_ground)
             stock_layout = itemView.findViewById(R.id.layout_col)
         }
-        }
     }
+}
