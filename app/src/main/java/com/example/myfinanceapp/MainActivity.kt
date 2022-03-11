@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var auth : FirebaseAuth
     private lateinit var binding: ActivityMainBinding
-
+    lateinit var accountEmail : String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -29,13 +29,20 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
 
+        // Displaying the home fragment on top of the FrameLayout
+        val homeFragment = HomeFragment()
         if (user != null) {
-            // Displaying the home fragment on top of the FrameLayout
-            val homeFragment = HomeFragment()
+            accountEmail = user.email.toString()
             setCurrentFragment(homeFragment)
         } else {
-            val signInIntent = Intent(this, SignInActivity::class.java)
-            startActivity(signInIntent)
+            val email = intent.extras?.getString("email")
+            if (email != null) {
+                accountEmail = email
+                setCurrentFragment(homeFragment)
+            } else {
+                val signInIntent = Intent(this, SignInActivity::class.java)
+                startActivity(signInIntent)
+            }
         }
     }
 
