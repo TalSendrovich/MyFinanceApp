@@ -1,184 +1,197 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_stocks"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.StockInfo">
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/tv52WeekRange"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fragment_stocks"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="84dp"
-        android:text="@string/_52_week_range"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMarketCapText" />
+        tools:context=".ui.home.StockInfo">
 
-    <TextView
-        android:id="@+id/tv52WeekRangeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="84dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv52WeekRange" />
+        <TextView
+            android:id="@+id/tvStockSymbol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="change"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.047"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvVolume"
-        android:layout_width="58dp"
-        android:layout_height="17dp"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="72dp"
-        android:text="@string/volume"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvOpenText" />
+        <TextView
+            android:id="@+id/tvCurrentPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="change"
+            android:textColor="@android:color/black"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvStockSymbol"
+            app:layout_constraintTop_toBottomOf="@+id/tvStockSymbol" />
 
-    <TextView
-        android:id="@+id/tvDayRangeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="12dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDayRange" />
+        <TextView
+            android:id="@+id/tvPriceChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/market_cap"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvCurrentPrice"
+            app:layout_constraintTop_toBottomOf="@+id/tvCurrentPrice" />
 
-    <TextView
-        android:id="@+id/tvDayRange"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="68dp"
-        android:text="@string/day_range"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvVolumeText" />
+<!--        <com.jjoe64.graphview.GraphView-->
+<!--            android:id="@+id/gvStock"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="142dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.5"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/tvPriceChange"-->
+<!--            app:seriesType="line" />-->
 
-    <TextView
-        android:id="@+id/tvMarketCapText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="84dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMarketCap" />
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/gvStock"
+            android:layout_width="match_parent"
+            android:layout_height="142dp"
+            android:layout_marginTop="10dp"
+            app:layout_goneMarginRight="@android:dimen/app_icon_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvPriceChange"
+            android:background="@color/white"
+            android:elevation="10dp"
+            />
 
-    <TextView
-        android:id="@+id/tvMarketCap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:layout_marginEnd="84dp"
-        android:text="@string/market_cap"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPrevCloseText" />
+        <TextView
+            android:id="@+id/tvStatistics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="Statistics"
+            android:textSize="20sp"
+            android:textStyle="bold|italic"
+            android:textColor="@android:color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gvStock" />
 
-    <TextView
-        android:id="@+id/tvVolumeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="12dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvVolume" />
+        <TextView
+            android:id="@+id/tvDayRangeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gvStock" />
 
-    <TextView
-        android:id="@+id/tvCurrentPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="76dp"
-        android:text="change"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivSymbol" />
+        <TextView
+            android:id="@+id/tvDayRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/day_range"
+            app:layout_constraintEnd_toStartOf="@+id/tvDayRangeText"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvStatistics"
+            app:layout_constraintTop_toBottomOf="@+id/tvStatistics" />
 
-    <TextView
-        android:id="@+id/tvPercentageChange"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="92dp"
-        android:text="change"
-        app:layout_constraintBottom_toBottomOf="@+id/tvCurrentPrice"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvCurrentPrice"
-        app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
-        android:id="@+id/tvPrevCloseText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="84dp"
-        android:text="change"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPrevClose" />
+        <TextView
+            android:id="@+id/tv52WeekRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/_52_week_range"
+            app:layout_constraintEnd_toStartOf="@+id/tv52WeekRangeText"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvDayRange"
+            app:layout_constraintTop_toBottomOf="@+id/tvDayRange" />
 
-    <TextView
-        android:id="@+id/tvPrevClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="68dp"
-        android:layout_marginEnd="70dp"
-        android:text="@string/prev_close"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPercentageChange" />
+        <TextView
+            android:id="@+id/tv52WeekRangeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDayRangeText" />
 
-    <TextView
-        android:id="@+id/tvOpenText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="8dp"
-        android:text="TextView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvOpen" />
+        <TextView
+            android:id="@+id/tvVolume"
+            android:layout_width="58dp"
+            android:layout_height="17dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/volume"
+            app:layout_constraintEnd_toStartOf="@+id/tvVolumeText"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvOpen"
+            app:layout_constraintTop_toBottomOf="@+id/tvOpen" />
 
-    <TextView
-        android:id="@+id/tvOpen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginTop="64dp"
-        android:text="@string/open"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCurrentPrice" />
+        <TextView
+            android:id="@+id/tvVolumeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvOpenText" />
 
-    <ImageView
-        android:id="@+id/ivSymbol"
-        android:layout_width="99dp"
-        android:layout_height="89dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvDescription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvStockName"
-        app:layout_constraintVertical_bias="0.533"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        <TextView
+            android:id="@+id/tvPrevCloseText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="change"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv52WeekRangeText" />
 
-    <TextView
-        android:id="@+id/tvDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="change"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/tvStockName"
-        app:layout_constraintHorizontal_bias="0.526"
-        app:layout_constraintStart_toStartOf="@+id/tvStockName"
-        app:layout_constraintTop_toBottomOf="@+id/tvStockName"
-        app:layout_constraintVertical_bias="0.027" />
+        <TextView
+            android:id="@+id/tvPrevClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/prev_close"
+            app:layout_constraintEnd_toStartOf="@+id/tvPrevCloseText"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv52WeekRange"
+            app:layout_constraintTop_toBottomOf="@+id/tv52WeekRange" />
 
-    <TextView
-        android:id="@+id/tvStockName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="change"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.115"
-        app:layout_constraintStart_toEndOf="@+id/ivSymbol"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tvOpenText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvPrevCloseText" />
+
+        <TextView
+            android:id="@+id/tvOpen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/open"
+            app:layout_constraintEnd_toStartOf="@+id/tvOpenText"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tvPrevClose"
+            app:layout_constraintTop_toBottomOf="@+id/tvPrevClose" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+

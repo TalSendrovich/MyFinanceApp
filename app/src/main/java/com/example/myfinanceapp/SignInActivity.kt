@@ -1,5 +1,6 @@
 package com.example.myfinanceapp
 
+import android.app.PendingIntent.getActivity
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -10,28 +11,26 @@ import android.widget.Toast
 import com.example.myfinanceapp.data.User
 import com.example.myfinanceapp.databinding.ActivitySignInBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.Exception
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
-const val REQUEST_CODE_SIGN_IN =0
+const val REQUEST_CODE_SIGN_IN = 0
 
 class SignInActivity : AppCompatActivity() {
 
     private val usersCollectionRef = Firebase.firestore.collection("users")
     private lateinit var mAuth: FirebaseAuth
     private lateinit var binding: ActivitySignInBinding
-    private lateinit var signInClient : GoogleSignInClient
+    private lateinit var signInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,11 +51,13 @@ class SignInActivity : AppCompatActivity() {
         try {
             usersCollectionRef.document(user.email).set(user).await()
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@SignInActivity, "Successfully Saved Data!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SignInActivity, "Successfully Saved Data!", Toast.LENGTH_SHORT)
+                    .show()
             }
         } catch (e: Exception) {
             withContext(Dispatchers.Main) {
-                Toast.makeText(this@SignInActivity, e.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SignInActivity, "Failed Saved account", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -78,30 +79,51 @@ class SignInActivity : AppCompatActivity() {
         val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()
 
         /** Checks the all the details about the user are correct
+         *  Checks if the user is not already signed up
          ** If they are correct than saves the user in the data base */
         binding.btnSignIn.setOnClickListener {
             var counter = 0
             val password = etPassword.text.toString()
             val email = etEmailAddress.text.toString()
-            val user = User(password, email)
+            val user = User(email, password)
 
             // Email Validator
             if (!email.matches(emailPattern)) {
                 counter++
                 etEmailAddress.setTextColor(Color.parseColor("#FF0000"))
             }
-            if (password=="") {
+            if (password == "") {
                 counter++
                 Toast.makeText(this, "Invalid information", Toast.LENGTH_SHORT).show()
             }
-            if (counter == 0)
-                saveUser(user)
+            if (counter == 0) {
+                usersCollectionRef.document(email).get().addOnCompleteListener{
+                    var isRegistered = true
+                    if(it.isSuccessful) {
+                        if (!it.result?.exists()!!) {
+                            isRegistered = false
+                            saveUser(user)
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.putExtra("email", email)
+                            startActivity(intent)
+                        } else {
+                            Toast.makeText(this, "User is already registered", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            }
         }
 
         binding.btnGoogleSignIn.setOnClickListener {
             signIn()
         }
     }
+
+    private fun checkIfUserExist(email: String): Boolean {
+        return false
+    }
+
 
     /** The function in charge of set the OnClickListeners of the Edit Text Views */
     private fun setEditTextListeners() {
@@ -110,10 +132,10 @@ class SignInActivity : AppCompatActivity() {
                 binding.etEmailAddress.callOnClick()
             }
         }
-        binding.etEmailAddress.setOnClickListener{
+        binding.etEmailAddress.setOnClickListener {
             binding.etEmailAddress.setTextColor(Color.parseColor("#FF000000"))
         }
-        binding.etPassword.setOnClickListener{
+        binding.etPassword.setOnClickListener {
             binding.etPassword.setTextColor(Color.parseColor("#FF000000"))
         }
     }
@@ -143,9 +165,7 @@ class SignInActivity : AppCompatActivity() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 // Google Sign In was successful, authenticate with Firebase
-                Log.d("Almost there"," here3")
                 val account = task.getResult(ApiException::class.java)!!
-                Log.d("Almost there"," here4")
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
@@ -158,9 +178,11 @@ class SignInActivity : AppCompatActivity() {
         mAuth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    Log.d("Almost there"," here")
-                    print("here")
+                    val acct = GoogleSignIn.getLastSignedInAccount(this)
+                    acct?.email?.let { Log.d("SignInAcovity", it) }
+                    saveUser(User(acct?.email!!))
                     val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("email", acct.email)
                     startActivity(intent)
                 } else {
                     Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()

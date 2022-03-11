@@ -10,33 +10,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myfinanceapp.R
-import com.example.myfinanceapp.ui.home.StockInfo
 import org.jetbrains.annotations.NotNull
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.myfinanceapp.MainActivity
+import com.example.myfinanceapp.ui.home.homefragments.StockInfo
 
 
 class MainStocksAdapter(cl: Context, s1: Array<String>) :
     RecyclerView.Adapter<MainStocksAdapter.StocksViewHolder>() {
     var stocks: Array<String> = s1
-    var context: Context
-    lateinit var p: ViewGroup
+    var context: Context = cl
 
-    init {
-        context = cl;
-    }
     @NotNull
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StocksViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-        var view: View = inflater.inflate(R.layout.my_column, parent,false )
+        val view: View = inflater.inflate(R.layout.my_column, parent,false )
         return StocksViewHolder(view)
     }
 //
@@ -49,22 +37,21 @@ class MainStocksAdapter(cl: Context, s1: Array<String>) :
 
         // TODO make navigation work after pressing this
         // TODO set all the views in the layout according to the data base
+
         holder.stock_layout.setOnClickListener(View.OnClickListener {
             val i = Bundle() // The object the holds the info passed the the stock_layout
-            i.putString("stock", stocks[position])
+            i.putString("symbol", stocks[position])
+
             // Creating the mechanism to replace the home layout with the stock layout
             val activity: AppCompatActivity = it.context as AppCompatActivity
+
            //  Initializing the container fragment and set the info the I want to pass
             val myFragment: Fragment = StockInfo()
             myFragment.arguments = i
 
-            activity.supportFragmentManager.beginTransaction().apply {
-                replace(R.id.nav_host_fragment_activity_main, myFragment ,"OptionsFragment")
-                addToBackStack(null)
-                commit()
-            }
+            (activity as MainActivity).setCurrentFragment(myFragment)
         })
-}
+    }
 
 
     override fun getItemCount(): Int {

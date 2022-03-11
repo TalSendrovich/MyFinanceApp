@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.homefragments.SearchViewFragment"
+    android:orientation="vertical">
+
+
+    <SearchView
+        android:id="@+id/svStocks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/searchview_background"
+        android:queryHint="Enter stock name"
+        android:iconifiedByDefault="true"
+        android:queryBackground="@android:color/transparent"
+        tools:layout_editor_absoluteY="2dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvStockList"
+        android:layout_width="409dp"
+        android:layout_height="681dp"
+        tools:layout_editor_absoluteX="2dp"
+        tools:layout_editor_absoluteY="50dp" />
+
+</LinearLayout>
