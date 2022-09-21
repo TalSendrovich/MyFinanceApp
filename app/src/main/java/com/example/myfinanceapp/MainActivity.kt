@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
-
+        //user = null
         // Displaying the home fragment on top of the FrameLayout
         val homeFragment = HomeFragment()
         if (user != null) {
