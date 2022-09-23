@@ -50,6 +50,7 @@ class SearchViewFragment : Fragment() {
         return root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadRecentSearches() {
         CoroutineScope(Dispatchers.IO).launch {
             val email = (activity as MainActivity).accountEmail
@@ -90,7 +91,7 @@ class SearchViewFragment : Fragment() {
         stockList.clear()
         searchViewAdapter.notifyDataSetChanged()
         CoroutineScope(Dispatchers.IO).launch {
-            var fixedQuery  = query?.capitalizeWords()
+            val fixedQuery  = query?.capitalizeWords()
 
             val querySnapshot = fixedQuery?.let {
                 db.collection("stocks").whereGreaterThanOrEqualTo("name", it)

@@ -60,7 +60,11 @@ class AccountFragment : Fragment() {
         return root
     }
 
-    fun setLogOut() {
+    /**
+     * Function responsible for logout when logged in without google
+     * NOT FINISHED!
+     */
+    private fun setLogOut() {
         binding.btnTest.setOnClickListener {
             val intent = Intent(activity as MainActivity, MainActivity::class.java)
             startActivity(intent)

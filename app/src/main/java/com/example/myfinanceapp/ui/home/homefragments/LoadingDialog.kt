@@ -6,17 +6,17 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import com.example.myfinanceapp.R
+import com.example.myfinanceapp.ui.home.HomeFragment
 
-class LoadingDialog(act: Activity) {
-    var activity = act
+class LoadingDialog(private val activity: Activity) {
     lateinit var dialog : AlertDialog
 
     @SuppressLint("InflateParams")
     fun startLoadingDialog() {
-        var builder = AlertDialog.Builder(activity)
-        var inflater = activity.layoutInflater
+        val builder = AlertDialog.Builder(activity)
+        val inflater = activity.layoutInflater
         builder.setView(inflater.inflate(R.layout.custom_dialog, null))
-        builder.setCancelable(false)
+        builder.setCancelable(true)
 
         dialog = builder.create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

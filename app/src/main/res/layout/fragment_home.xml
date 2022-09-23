@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <SearchView
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMainStocks"
+        android:id="@+id/rvMainIndexes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -35,7 +35,7 @@
         android:layout_marginTop="15dp"
         android:text="@string/lists"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvMainStocks" />
+        app:layout_constraintTop_toBottomOf="@+id/rvMainIndexes" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvLists"

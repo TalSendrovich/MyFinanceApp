@@ -18,9 +18,7 @@ import com.example.myfinanceapp.ui.home.homefragments.StockInfo
 import java.util.ArrayList
 
 
-class SearchViewAdapter(context: Context, stockList : ArrayList<Stock>) : RecyclerView.Adapter<SearchViewAdapter.SearchViewHolder>() {
-    var context = context
-    var stockList = stockList
+class SearchViewAdapter(var context: Context, var stockList: ArrayList<Stock>) : RecyclerView.Adapter<SearchViewAdapter.SearchViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
@@ -33,6 +31,10 @@ class SearchViewAdapter(context: Context, stockList : ArrayList<Stock>) : Recycl
         holder.tvSymbol.text = stock.symbol
         holder.tvStockNameItem.text = stock.name
 
+        /**
+         * Set the ability to click on the search view items
+         * Move to the stock info page when clicked
+         */
         holder.clStockItem.setOnClickListener {
             val bundle = Bundle()
             bundle.putString("symbol", stockList[position].symbol)

@@ -34,12 +34,9 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firestore.admin.v1.Index
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
-import java.time.LocalDateTime
 
 
 const val TAG = "StockInfo"
@@ -78,7 +75,7 @@ class StockInfo : Fragment() {
         val root: View = binding.root
 
         // Saves important information
-        bundle = this.arguments!!
+        bundle = this.requireArguments()
         val loadingDialog = LoadingDialog(activity as MainActivity)
         loadingDialog.startLoadingDialog()
         //setDialog()
@@ -363,7 +360,7 @@ class StockInfo : Fragment() {
 
 
     private fun returnButton() {
-        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val nextFrag = HomeFragment()
                 activity!!.supportFragmentManager.beginTransaction().apply {

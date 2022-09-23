@@ -5,12 +5,11 @@
     <string name="title_notifications">Notifications</string>
     <string name="text">Title</string>
 
-    <string-array name="main_stocks">
+    <string-array name="main_indexes">
         <item><b>S&amp;P 500</b></item>
         <item><b>Dow Jones</b></item>
         <item><b>Nasdaq</b></item>
         <item><b>Russel 2000</b></item>
-        <item><b>Gold</b></item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="webclient_id">926656167201-jncuq9nhnvqffli5vigh16h7rh2nhttj.apps.googleusercontent.com</string>
