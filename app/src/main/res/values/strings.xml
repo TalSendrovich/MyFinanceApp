@@ -27,4 +27,6 @@
     <string name="surname">Surname</string>
     <string name="sign_up">Sign Up</string>
     <string name="lists">Lists</string>
+    <string name="create_list">Create List</string>
+    <string name="delete_list">Delete List</string>
 </resources>

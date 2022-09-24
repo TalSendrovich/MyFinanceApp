@@ -10,8 +10,6 @@ import com.example.myfinanceapp.ui.dashboard.DashboardFragment
 import com.example.myfinanceapp.ui.home.HomeFragment
 import com.example.myfinanceapp.ui.account.AccountFragment
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         // Setting the navigation Bar
         navigationBarController()
 
@@ -36,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             setCurrentFragment(homeFragment)
         } else {
             val email = intent.extras?.getString("email")
-            if (email != null) {
+            if (email != null && email != "") {
                 accountEmail = email
                 setCurrentFragment(homeFragment)
             } else {
@@ -46,12 +43,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun navigationBarController(){
         val homeFragment = HomeFragment()
         val dashboardFragment = DashboardFragment()
         val notificationsFragment = AccountFragment()
 
-        setCurrentFragment(homeFragment)
         val navView: BottomNavigationView = binding.navView
         navView.setOnItemSelectedListener {
             when (it.itemId) {

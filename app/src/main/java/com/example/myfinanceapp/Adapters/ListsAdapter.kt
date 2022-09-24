@@ -9,10 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myfinanceapp.R
 import com.example.myfinanceapp.data.MyList
 
-class ListsAdapter(cl : Context, s1: ArrayList<MyList>) : RecyclerView.Adapter<ListsAdapter.ListViewHolder>() {
-    val context = cl
-    var myLists = s1
-
+class ListsAdapter(val context : Context, private val myLists: ArrayList<MyList>) : RecyclerView.Adapter<ListsAdapter.ListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -22,7 +19,9 @@ class ListsAdapter(cl : Context, s1: ArrayList<MyList>) : RecyclerView.Adapter<L
 
     override fun onBindViewHolder(holder: ListViewHolder, position: Int) {
         holder.tvTitle.text = myLists[position].name
-//        holder.tvNumSymbols.text = myLists[position].numSymbols
+        //TODO add num symbols
+
+
     }
 
     override fun getItemCount(): Int {
