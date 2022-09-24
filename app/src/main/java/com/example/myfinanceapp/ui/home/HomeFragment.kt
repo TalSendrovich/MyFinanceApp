@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,10 +21,8 @@ import com.example.myfinanceapp.api.StockData
 import com.example.myfinanceapp.data.MyList
 import com.example.myfinanceapp.databinding.FragmentHomeBinding
 import com.example.myfinanceapp.ui.home.homefragments.LoadingDialog
-import com.example.myfinanceapp.ui.home.homefragments.LoadingDialog1
 import com.example.myfinanceapp.ui.home.homefragments.SearchViewFragment
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
@@ -55,26 +54,36 @@ open class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         mAuth = FirebaseAuth.getInstance()
-
         homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
-
+            ViewModelProvider(this)[HomeViewModel::class.java]
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
 
         mainStocksRecyclerViewCreator(root)
         listsRecyclerViewCreator(root)
+        userListManagerCreator(root)
         searchViewCreator()
 
         return root
     }
 
+    private fun userListManagerCreator(root: View) {
+        val ibUserListManger = binding.ibUserListManager
+
+        ibUserListManger.setOnClickListener {
+            val puListManagementMenu = PopupMenu(context, ibUserListManger)
+            puListManagementMenu.inflate(R.menu.user_list_managment_popup_menu)
+            puListManagementMenu.show()
+        }
+    }
+
     private fun listsRecyclerViewCreator(root: View) {
+        listStocks.clear()
         email = (activity as MainActivity).accountEmail //Check!!
         val listsCollectionRef = Firebase.firestore.collection("users/$email/stock lists")
 
-        CoroutineScope(IO).launch {
+        CoroutineScope(IO).async {
             val querySnapshot = listsCollectionRef.get().await()
             Log.d("HomeFragment", "Inside listsRecyclerViewCreator")
             for (doc in querySnapshot.documents) {
@@ -83,8 +92,6 @@ open class HomeFragment : Fragment() {
                     Log.d("HomeFragment", "$it")
                 }
             }
-
-            //Log.d("HomeFragment", "$listStocks")
 
             withContext(Main) {
                 val listStocksAdapter = ListsAdapter(requireContext(), listStocks)
@@ -136,7 +143,12 @@ open class HomeFragment : Fragment() {
      * Eventually the RecyclerView is updated
      */
     private fun updateIndexesInfo(indexesPrice: Array<String>, indexesPercentage: Array<String>) {
-        val progressBar = initializeLoadingDialog()
+        val progressBar = AlertDialog.Builder(this.context)
+            .setView(R.layout.custom_dialog)
+            .setCancelable(true)
+            .create()
+        progressBar.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        progressBar.show()
 
         CoroutineScope(IO).launch {
             getIndexesCurrentPrice(indexesPrice)
@@ -146,14 +158,8 @@ open class HomeFragment : Fragment() {
 
     }
 
-    private fun initializeLoadingDialog() : AlertDialog {
-        val progressBar = AlertDialog.Builder(this.context)
-            .setView(R.layout.custom_dialog)
-            .setCancelable(true)
-            .create()
-        progressBar.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        progressBar.show()
-        return progressBar
+    private fun initializeLoadingDialog() {
+
     }
 
     /**

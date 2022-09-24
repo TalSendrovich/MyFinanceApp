@@ -84,7 +84,8 @@ class AccountFragment : Fragment() {
         binding.btnGoogleSignOut.setOnClickListener{
             mAuth.signOut()
             signInClient.signOut()
-            val intent = Intent(activity, MainActivity::class.java)
+            val intent = Intent(activity as MainActivity, MainActivity::class.java)
+            intent.putExtra("email", "")
             startActivity(intent)
         }
     }

@@ -30,16 +30,13 @@ class MainStocksAdapter(var context: Context, var stocks: Array<String>, private
         val view: View = inflater.inflate(R.layout.my_column, parent,false )
         return StocksViewHolder(view)
     }
-//
+
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: StocksViewHolder, position: Int) {
-        // Setting the views in the col_layout with the appropriate text
         holder.itemKode.text = stocks[position]
-        // TODO change the color here to dynamic color
-        // TODO means if the stock is up - green, if stock is doewn so red
         holder.tvPoints.text = indexesPrices[position]
         val percentageChange = indexesPercentage[position]
-        println(percentageChange)
+
         if (percentageChange.toFloat() >= 0)
             holder.text_back_ground.setBackgroundResource(R.drawable.green_rounded_corners)
         else
@@ -47,11 +44,7 @@ class MainStocksAdapter(var context: Context, var stocks: Array<String>, private
 
         holder.tvPercentageChange.text = "$percentageChange% "
 
-        // TODO make navigation work after pressing this
-        // TODO set all the views in the layout according to the data base
-
         setIndexesClickable(holder, position)
-
     }
 
     /**

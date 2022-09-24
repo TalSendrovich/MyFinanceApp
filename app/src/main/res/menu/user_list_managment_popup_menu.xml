@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/puCreateList"
+        android:title="@string/create_list"/>
+    <item android:id="@+id/puDeleteList"
+        android:title="@string/delete_list"/>
+</menu>
