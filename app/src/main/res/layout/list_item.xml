@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clListItem"
+    android:layout_width="match_parent"
+    android:layout_height="70dp">
+
+
+    <TextView
+        android:id="@+id/tvSingleStockName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:text="tmp"
+        android:textSize="13sp"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSingleStockSymbol" />
+
+    <TextView
+        android:id="@+id/tvSingleStockSymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:textColor="@color/black"
+        android:text=""
+        android:textSize="16sp"
+        android:textStyle="italic|bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvListCurrentPrice" />
+
+    <TextView
+        android:id="@+id/tvListCurrentPrice"
+        android:layout_width="64dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/tvListPercentageChangeBackGround"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/tvListPercentageChangeBackGround"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvListPercentageChangeBackGround"
+        android:layout_width="64dp"
+        android:layout_height="27dp"
+        android:layout_marginEnd="25dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvListCurrentPrice" />
+
+    <TextView
+        android:id="@+id/tvListPercentageChange"
+        android:layout_width="46dp"
+        android:layout_height="21dp"
+        android:text="change"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/tvListPercentageChangeBackGround"
+        app:layout_constraintEnd_toEndOf="@+id/tvListPercentageChangeBackGround"
+        app:layout_constraintStart_toStartOf="@+id/tvListPercentageChangeBackGround"
+        app:layout_constraintTop_toTopOf="@+id/tvListPercentageChangeBackGround" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,23 +5,26 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myfinanceapp.Adapters.ListsAdapter
 import com.example.myfinanceapp.Adapters.MainStocksAdapter
 import com.example.myfinanceapp.MainActivity
+import com.example.myfinanceapp.MainViewModel
 import com.example.myfinanceapp.R
 import com.example.myfinanceapp.api.StockData
 import com.example.myfinanceapp.data.MyList
 import com.example.myfinanceapp.databinding.FragmentHomeBinding
-import com.example.myfinanceapp.ui.home.homefragments.LoadingDialog
+import com.example.myfinanceapp.ui.home.homefragments.CreateListFragment
 import com.example.myfinanceapp.ui.home.homefragments.SearchViewFragment
+import com.example.myfinanceapp.ui.home.homefragments.UserLists
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -39,7 +42,10 @@ open class HomeFragment : Fragment() {
     private lateinit var email: String
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var mainStocksAdapter: MainStocksAdapter
-    private lateinit var loadingDialog : LoadingDialog
+    private lateinit var userListsAdaper: ListsAdapter
+    private val sharedViewModel: MainViewModel by activityViewModels()
+    private val usersCollectionRef = Firebase.firestore.collection("users")
+
     private var _binding: FragmentHomeBinding? = null
     private val apikey: String = "73990e67670a472396934b1757bfb135"
 
@@ -60,7 +66,7 @@ open class HomeFragment : Fragment() {
         val root: View = binding.root
 
 
-        mainStocksRecyclerViewCreator(root)
+        mainIndexesRecyclerViewCreator(root)
         listsRecyclerViewCreator(root)
         userListManagerCreator(root)
         searchViewCreator()
@@ -68,6 +74,9 @@ open class HomeFragment : Fragment() {
         return root
     }
 
+    /**
+     * The function in charge of creating the user list menu
+     */
     private fun userListManagerCreator(root: View) {
         val ibUserListManger = binding.ibUserListManager
 
@@ -75,29 +84,116 @@ open class HomeFragment : Fragment() {
             val puListManagementMenu = PopupMenu(context, ibUserListManger)
             puListManagementMenu.inflate(R.menu.user_list_managment_popup_menu)
             puListManagementMenu.show()
+
+            puListManagementMenu.setOnMenuItemClickListener {
+                val id = it.itemId
+                if (id == R.id.puCreateList)
+                    moveToCreateListFragment()
+                else if (id == R.id.puDeleteList)
+                    createDeleteMenu()
+
+                true
+            }
+
         }
     }
 
-    private fun listsRecyclerViewCreator(root: View) {
-        listStocks.clear()
-        email = (activity as MainActivity).accountEmail //Check!!
-        val listsCollectionRef = Firebase.firestore.collection("users/$email/stock lists")
-
-        CoroutineScope(IO).async {
-            val querySnapshot = listsCollectionRef.get().await()
-            Log.d("HomeFragment", "Inside listsRecyclerViewCreator")
-            for (doc in querySnapshot.documents) {
-                doc.toObject(MyList::class.java)?.let {
-                    listStocks.add(it)
-                    Log.d("HomeFragment", "$it")
-                }
-            }
+    /**
+     * Delete menu builder
+     */
+    private fun createDeleteMenu() {
+        CoroutineScope(IO).launch {
+            val listsNames = getListsNames()
 
             withContext(Main) {
-                val listStocksAdapter = ListsAdapter(requireContext(), listStocks)
-                binding.rvLists.adapter = listStocksAdapter
+                var chosenList = listsNames[0]
+                AlertDialog.Builder(this@HomeFragment.context)
+                    .setTitle("Choose the list to delete")
+                    .setSingleChoiceItems(listsNames, 0) { _ , i ->
+                        chosenList = listsNames[i]
+                    }
+                    .setPositiveButton("Accept") { _, _ ->
+                        CoroutineScope(IO).launch {
+                            deleteList(listsNames, chosenList)
+                        }
+                    }
+                    .create()
+                    .show()
+            }
+        }
+    }
+
+
+    /**
+     * Delete the list from storage in the cloud
+     * Updates the internal storage
+     * Updates the recycler view
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    private suspend fun deleteList(listsNames: Array<out String>, listToDelete: String) {
+        usersCollectionRef.document(email)
+            .collection("stock lists")
+            .document(listToDelete).delete().await()
+
+        deleteStockFromInternalList(listToDelete)
+        withContext(Main) {
+            userListsAdaper.notifyDataSetChanged()
+            Toast.makeText(
+                this@HomeFragment.context,
+                "Deleted $listToDelete list",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+        }
+    }
+
+    /**
+     * Delete a specific list from internal storage
+     * Means it deletes the list from the arrayList in this fragment
+     */
+    private fun deleteStockFromInternalList(listToDelete: String) {
+        for (i in 0 until listStocks.size) {
+            if (listStocks[i].name == listToDelete)
+                listStocks.removeAt(i)
+            break
+        }
+    }
+
+    private suspend fun getListsNames(): Array<out String> {
+        val listsNames = arrayListOf<String>()
+        val stockLists = usersCollectionRef.document(email)
+            .collection("stock lists")
+            .get().await()
+
+        for (doc in stockLists.documents) {
+            listsNames.add(doc.get("name") as String)
+        }
+        return listsNames.toTypedArray()
+    }
+
+
+    private fun moveToCreateListFragment() {
+        val createListFragment = CreateListFragment()
+        val bundle = Bundle()
+        bundle.putBoolean("fromHomePage", true)
+        bundle.putBoolean("Editing", false)
+        createListFragment.arguments = bundle
+        (activity as MainActivity).setCurrentFragment(createListFragment)
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun listsRecyclerViewCreator(root: View) {
+        val userLists = UserLists()
+        email = (activity as MainActivity).accountEmail //Check!!
+        CoroutineScope(IO).launch() {
+            userLists.getUserLists(email, listStocks)
+            withContext(Main) {
+                userListsAdaper = ListsAdapter(requireContext(), sharedViewModel, listStocks)
+                binding.rvLists.adapter = userListsAdaper
                 val layoutManager = LinearLayoutManager(root.context)
                 binding.rvLists.layoutManager = layoutManager
+                userListsAdaper.notifyDataSetChanged()
             }
         }
     }
@@ -109,6 +205,9 @@ open class HomeFragment : Fragment() {
     private fun searchViewCreator() {
         binding.searchView.setOnClickListener {
             val searchFragment = SearchViewFragment()
+            val bundle = Bundle()
+            bundle.putBoolean("fromHomePage", true)
+            searchFragment.arguments = bundle
             activity?.supportFragmentManager?.beginTransaction()?.apply {
                 replace(R.id.nav_host_fragment_activity_main, searchFragment, "OptionsFragment")
                 addToBackStack(null)
@@ -122,14 +221,13 @@ open class HomeFragment : Fragment() {
      * Initialize and creates the recycler view of main indexes
      * S&P500, Nasdaq, etc
      */
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun mainStocksRecyclerViewCreator(root: View) {
-        var indexesPrice = arrayOf("0", "0", "0", "0")
-        var indexesPercentage = arrayOf("0", "0", "0", "0")
+    private fun mainIndexesRecyclerViewCreator(root: View) {
+        val indexesPrice = arrayOf("0", "0", "0", "0")
+        val indexesPercentage = arrayOf("0", "0", "0", "0")
 
         mainIndexes = resources.getStringArray(R.array.main_indexes)
-        mainStocksAdapter = MainStocksAdapter(requireContext(), mainIndexes, indexesPrice, indexesPercentage)
+        mainStocksAdapter =
+            MainStocksAdapter(requireContext(), mainIndexes, indexesPrice, indexesPercentage)
         binding.rvMainIndexes.adapter = mainStocksAdapter
         val layoutManager = LinearLayoutManager(root.context, LinearLayoutManager.HORIZONTAL, false)
         binding.rvMainIndexes.layoutManager = layoutManager
@@ -158,18 +256,16 @@ open class HomeFragment : Fragment() {
 
     }
 
-    private fun initializeLoadingDialog() {
-
-    }
-
     /**
      * Get the open prices of all the main indexes
      * Calculates the percentage of daily change
      */
     @SuppressLint("NotifyDataSetChanged")
-    private suspend fun getIndexesCurrentPercentage(indexesPrice: Array<String>,
-                                                    indexesPercentage: Array<String>,
-                                                    progressBar : AlertDialog) {
+    private suspend fun getIndexesCurrentPercentage(
+        indexesPrice: Array<String>,
+        indexesPercentage: Array<String>,
+        progressBar: AlertDialog
+    ) {
         val arrSymbols = arrayOf("SPX", "dji", "IXIC", "rut")
         var index = 0
         for (i in arrSymbols) {
@@ -177,12 +273,12 @@ open class HomeFragment : Fragment() {
 
             if (priceJob.isSuccessful && priceJob.body() != null) {
                 val openPrice = priceJob.body()!!.open.toFloat()
-                val percentage = "%.2f".format(((indexesPrice[index].toFloat() * 100) / openPrice) - 100)
+                val percentage =
+                    "%.2f".format(((indexesPrice[index].toFloat() * 100) / openPrice) - 100)
                 indexesPercentage[index] = percentage
             }
             index += 1
         }
-        progressBar.dismiss()
         updateMainIndexesRecyclerview()
     }
 

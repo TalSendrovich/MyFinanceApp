@@ -8,12 +8,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myfinanceapp.Adapters.CreateListAdapter
 import com.example.myfinanceapp.Adapters.SearchViewAdapter
 import com.example.myfinanceapp.MainActivity
+import com.example.myfinanceapp.MainViewModel
+import com.example.myfinanceapp.data.SimpleStock
 import com.example.myfinanceapp.data.Stock
 import com.example.myfinanceapp.databinding.FragmentSearchViewBinding
+import com.example.myfinanceapp.ui.home.HomeViewModel
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
@@ -24,11 +31,13 @@ class SearchViewFragment : Fragment() {
 
     lateinit var recyclerView: RecyclerView
     lateinit var stockList: ArrayList<Stock>
+    lateinit var createStockList: ArrayList<SimpleStock>
     lateinit var searchViewAdapter: SearchViewAdapter
     lateinit var db: FirebaseFirestore
+    private lateinit var bundle: Bundle
     private var _binding: FragmentSearchViewBinding? = null
     private var TAG = "SearchViewFragment"
-
+    private val viewModel : MainViewModel by activityViewModels()
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -40,8 +49,8 @@ class SearchViewFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentSearchViewBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        setRecyclerView()
+        bundle = this.requireArguments()
+        setRecyclerView(bundle.getBoolean("fromHomePage"))
         binding.svStocks.onActionViewExpanded() // Doesn't work
         binding.svStocks.requestFocus() // Doesn't work
         loadRecentSearches()
@@ -91,7 +100,7 @@ class SearchViewFragment : Fragment() {
         stockList.clear()
         searchViewAdapter.notifyDataSetChanged()
         CoroutineScope(Dispatchers.IO).launch {
-            val fixedQuery  = query?.capitalizeWords()
+            val fixedQuery = query?.capitalizeWords()
 
             val querySnapshot = fixedQuery?.let {
                 db.collection("stocks").whereGreaterThanOrEqualTo("name", it)
@@ -114,7 +123,6 @@ class SearchViewFragment : Fragment() {
     }
 
 
-
     fun String.capitalizeWords(): String = split(" ").joinToString(" ") { it ->
         it.replaceFirstChar {
             if (it.isLowerCase())
@@ -124,14 +132,21 @@ class SearchViewFragment : Fragment() {
     }
 
 
-    private fun setRecyclerView() {
+    private fun setRecyclerView(fromHomePage: Boolean) {
+        db = FirebaseFirestore.getInstance()
         recyclerView = binding.rvStockList
         recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        db = FirebaseFirestore.getInstance()
         stockList = ArrayList()
-        searchViewAdapter = SearchViewAdapter(requireContext(), stockList)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        searchViewAdapter = SearchViewAdapter(requireContext(), viewModel ,stockList, fromHomePage)
         recyclerView.adapter = searchViewAdapter
     }
 
+    private fun getCreatedStockList(createStockList: ArrayList<SimpleStock>) {
+        val symbolsArray = bundle.getStringArrayList("symbols")!!
+        val namesArray = bundle.getStringArrayList("names")!!
+        for (i in 0 until symbolsArray.size)
+            createStockList.add(SimpleStock(symbolsArray[i], namesArray[i]))
+    }
 }
+
