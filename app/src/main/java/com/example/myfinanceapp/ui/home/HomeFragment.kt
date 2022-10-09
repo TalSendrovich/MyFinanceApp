@@ -19,7 +19,8 @@ import com.example.myfinanceapp.Adapters.MainStocksAdapter
 import com.example.myfinanceapp.MainActivity
 import com.example.myfinanceapp.MainViewModel
 import com.example.myfinanceapp.R
-import com.example.myfinanceapp.api.StockData
+import com.example.myfinanceapp.api.stockApi.ApiManager
+import com.example.myfinanceapp.api.stockApi.StockData
 import com.example.myfinanceapp.data.MyList
 import com.example.myfinanceapp.databinding.FragmentHomeBinding
 import com.example.myfinanceapp.ui.home.homefragments.CreateListFragment
@@ -137,13 +138,13 @@ open class HomeFragment : Fragment() {
 
         deleteStockFromInternalList(listToDelete)
         withContext(Main) {
-            userListsAdaper.notifyDataSetChanged()
             Toast.makeText(
                 this@HomeFragment.context,
                 "Deleted $listToDelete list",
                 Toast.LENGTH_SHORT
-            )
-                .show()
+            ).show()
+
+            userListsAdaper.notifyDataSetChanged()
         }
     }
 
@@ -159,6 +160,10 @@ open class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * Collects the data of the list names
+     * Provided to set Delete Menu
+     */
     private suspend fun getListsNames(): Array<out String> {
         val listsNames = arrayListOf<String>()
         val stockLists = usersCollectionRef.document(email)
@@ -268,15 +273,16 @@ open class HomeFragment : Fragment() {
     ) {
         val arrSymbols = arrayOf("SPX", "dji", "IXIC", "rut")
         var index = 0
+        val apiManager = ApiManager()
         for (i in arrSymbols) {
-            val priceJob = StockData.api.getQuote(i, apikey)
+            val quote = apiManager.getQuote(i, apikey)
 
-            if (priceJob.isSuccessful && priceJob.body() != null) {
-                val openPrice = priceJob.body()!!.open.toFloat()
-                val percentage =
-                    "%.2f".format(((indexesPrice[index].toFloat() * 100) / openPrice) - 100)
-                indexesPercentage[index] = percentage
-            }
+            //if (priceJob.isSuccessful && priceJob.body() != null) {
+                //val openPrice = priceJob.body()!!.open.toFloat()
+            val previousClosed = quote.previous_close.toFloat()
+            val percentage =
+                "%.2f".format(((indexesPrice[index].toFloat() * 100) / previousClosed) - 100)
+            indexesPercentage[index] = percentage
             index += 1
         }
         updateMainIndexesRecyclerview()

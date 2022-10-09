@@ -1,16 +1,9 @@
 package com.example.myfinanceapp.ui.home.homefragments
 
-import android.util.Log
-import com.example.myfinanceapp.MainActivity
-import com.example.myfinanceapp.api.ApiManager
+import com.example.myfinanceapp.api.stockApi.ApiManager
 import com.example.myfinanceapp.data.MyList
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class UserLists {
