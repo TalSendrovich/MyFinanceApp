@@ -32,4 +32,8 @@
     <string name="create_list_text">Search relevant stocks you want to add to the list. The chosen stocks will appear below</string>
     <string name="list_name">List name</string>
     <string name="save">save</string>
+
+
+    <string name="hyperlink">Open <a href="https://www.geeksforgeeks.org">GeeksforGeeks portal</a></string>
+
 </resources>

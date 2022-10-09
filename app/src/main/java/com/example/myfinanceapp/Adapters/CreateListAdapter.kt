@@ -17,7 +17,8 @@ import com.example.myfinanceapp.data.SimpleStock
 import com.example.myfinanceapp.data.Stock
 import java.util.ArrayList
 
-class CreateListAdapter(context: Context, var viewModel: MainViewModel, var stockList: ArrayList<SimpleStock>) : RecyclerView.Adapter<CreateListAdapter.CreateListViewHolder>() {
+class CreateListAdapter(context: Context, var viewModel: MainViewModel, var stockList: ArrayList<SimpleStock>) :
+    RecyclerView.Adapter<CreateListAdapter.CreateListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CreateListAdapter.CreateListViewHolder {
         val inflater = LayoutInflater.from(parent.context)

@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myfinanceapp.MainActivity
 import com.example.myfinanceapp.R
-import com.example.myfinanceapp.api.ApiManager
+import com.example.myfinanceapp.api.stockApi.ApiManager
 import com.example.myfinanceapp.data.SimpleStock
 import com.example.myfinanceapp.ui.home.homefragments.StockInfo
 import kotlinx.coroutines.CoroutineScope

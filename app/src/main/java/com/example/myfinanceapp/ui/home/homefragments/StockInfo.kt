@@ -1,7 +1,9 @@
 package com.example.myfinanceapp.ui.home.homefragments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.myfinanceapp.MainActivity
-import com.example.myfinanceapp.api.StockData
+import com.example.myfinanceapp.api.stockApi.StockData
 import com.example.myfinanceapp.data.apidata.quote.Quote
 import com.example.myfinanceapp.data.apidata.timeseries.TimeSeries
 import com.example.myfinanceapp.data.apidata.timeseries.Value
@@ -26,6 +28,7 @@ import com.github.mikephil.charting.data.LineData
 
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.example.myfinanceapp.R
+import com.example.myfinanceapp.api.stockApi.ApiManager
 import com.example.myfinanceapp.data.RecentSearch
 import com.example.myfinanceapp.ui.home.HomeFragment
 import com.google.firebase.Timestamp
@@ -35,6 +38,8 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 
@@ -60,6 +65,7 @@ class StockInfo : Fragment() {
     var price: Double? = 0.0
     private lateinit var bundle: Bundle
     private val apiKey = "73990e67670a472396934b1757bfb135"
+    private val apiManager = ApiManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +82,9 @@ class StockInfo : Fragment() {
 
         // Saves important information
         bundle = this.requireArguments()
-        val loadingDialog = LoadingDialog(activity as MainActivity)
-        loadingDialog.startLoadingDialog()
+        val loadingDialog = startProgressBar()
+//        val loadingDialog = LoadingDialog(activity as MainActivity)
+//        loadingDialog.startLoadingDialog()
         //setDialog()
         // Makes the return button work
         returnButton()
@@ -88,8 +95,18 @@ class StockInfo : Fragment() {
     }
 
 
-    private fun setDialog() {
+    private fun endProcessBar(progressBar: AlertDialog) {
+        progressBar.dismiss()
+    }
 
+    private fun startProgressBar(): AlertDialog {
+        val progressBar = AlertDialog.Builder(this.context)
+            .setView(R.layout.custom_dialog)
+            .setCancelable(true)
+            .create()
+        progressBar.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        progressBar.show()
+        return progressBar
     }
 
 
@@ -128,10 +145,14 @@ class StockInfo : Fragment() {
         }.await()
     }
 
-    private fun launchRealTimeData(loadingDialog : LoadingDialog) {
-        launchRealTimePrice()
-        launchRealTimeQuote()
-        launchRealTimeSeries(loadingDialog)
+    private fun launchRealTimeData(loadingDialog : AlertDialog) {
+        CoroutineScope(IO).launch {
+            val apiManager = ApiManager()
+            val symbol = bundle.getString("symbol")!!
+            launchRealTimePrice(symbol)
+            launchRealTimeQuote(symbol)
+            launchRealTimeSeries(apiManager, symbol,loadingDialog)
+        }
     }
 
     /** ---------- Start to launch data ----------*/
@@ -141,31 +162,16 @@ class StockInfo : Fragment() {
      * Takes data from the api
      * Creating the Graph of the stock for TODAY
      */
-    private fun launchRealTimeSeries(loadingDialog : LoadingDialog) {
-        lifecycleScope.launchWhenCreated {
-            val response = try {
-                bundle.getString("symbol")?.let {
-                    StockData.api.getTimeSeries(it, "1min", "5000", "yesterday", apiKey)
-                }
-            } catch (e: IOException) {
-                Log.e(TAG, "IOException, you might not have internet connection")
-                return@launchWhenCreated
-            } catch (e: HttpException) {
-                Log.e(TAG, "HTTPException, unexpected response")
-                return@launchWhenCreated
-            }
-            if (response != null) {
-                delay(200)
-                if (response.isSuccessful && response.body() != null)
-                    createGraph(response.body(), loadingDialog)
-            }
-        }
+    private suspend fun launchRealTimeSeries(apiManager: ApiManager, symbol : String,
+                                             loadingDialog : AlertDialog) {
+            val timeSeries = apiManager.getTimeSeries(symbol)
+            createGraph(timeSeries, loadingDialog)
     }
 
     /**
      * Collecting the necessary data from the api call using helper functions
      */
-    private fun createGraph(timeSeries: TimeSeries?, loadingDialog : LoadingDialog) {
+    private fun createGraph(timeSeries: TimeSeries?, loadingDialog : AlertDialog) {
         val size = timeSeries?.values?.size!!
         val positions = setStockData(size, timeSeries.values)
         val line = setStockPreviousData(size, previous_closed)
@@ -178,7 +184,7 @@ class StockInfo : Fragment() {
         val data = LineData(dataSets)
 
         paintGraph(data)
-        loadingDialog.endDialog()
+        endProcessBar(loadingDialog)
     }
 
     private fun setGraphSize(prev: Float?): LineDataSet {
@@ -221,8 +227,8 @@ class StockInfo : Fragment() {
      */
     private fun setStockPreviousData(size: Int, previousClosed: Float?): LineDataSet {
         val line: MutableList<Entry> = mutableListOf()
-        line.add(Entry(0f, previous_closed!!))
-        line.add(Entry(size.toFloat() / 2, previous_closed!!))
+        line.add(Entry(0f, previousClosed!!))
+        line.add(Entry(size.toFloat() / 2, previousClosed))
 
         val setComp2 = LineDataSet(line, "Previous Close")
         setComp2.apply {
@@ -267,26 +273,14 @@ class StockInfo : Fragment() {
      * Takes data from the api
      * Setting general information for the layout
      */
-    private fun launchRealTimeQuote() {
-        lifecycleScope.launchWhenCreated {
-            val response = try {
-                bundle.getString("symbol")?.let {
-                    StockData.api.getQuote(it, apiKey)
-                }
-            } catch (e: IOException) {
-                Log.e(TAG, "IOException, you might not have internet connection")
-                return@launchWhenCreated
-            } catch (e: HttpException) {
-                Log.e(TAG, "HTTPException, unexpected response")
-                return@launchWhenCreated
-            }
-            if (response != null) {
-                if (response.isSuccessful && response.body() != null) {
-                    setLayoutTextViews(response.body())
-                }
-            }
+    private suspend fun launchRealTimeQuote(symbol: String) {
+        val quote = apiManager.getQuote(symbol, apiKey)
+
+        withContext(Main) {
+            setLayoutTextViews(quote)
         }
     }
+
 
     /**
      * Setting the stock_info_layout
@@ -299,25 +293,24 @@ class StockInfo : Fragment() {
         previous_closed = quote?.previous_close?.toFloat()
         val pointsChange = price?.minus(previous_closed?.toDouble()!!)
         Log.d("StockInfo", "$pointsChange")
-        var percentageChange = 0.0
+        var percentageChange = ""
 
         binding.tvStockSymbol.text = quote?.symbol
         binding.tvOpenText.text = open
         var sign: String
+        percentageChange = apiManager.calculatePercentageChange(price.toString(),
+            previous_closed.toString())
         if (pointsChange!! >= 0) {
-            percentageChange = (price!! / previous_closed!!) *100 - 100
             sign = "+"
-            if (pointsChange > 0)
-                binding.tvPriceChange.setTextColor(Color.GREEN)
+            binding.tvPriceChange.setTextColor(Color.GREEN)
         } else {
-            percentageChange = 100 - (price!! / previous_closed!!) * 100
             binding.tvPriceChange.setTextColor(Color.RED)
-            sign = "-"
+            sign = ""
         }
 
         binding.tvPrevCloseText.text = previous_closed.toString()
         binding.tvPriceChange.text = String.format("%.2f", pointsChange) +
-                " ($sign${String.format("%.2f", percentageChange)}%)"
+                " ($sign$percentageChange%)"
         binding.tvVolumeText.text = quote?.volume
 
         binding.tvDayRangeText.text = "$low - $high"
@@ -332,27 +325,12 @@ class StockInfo : Fragment() {
      * Getting the current price of the stock
      */
     @SuppressLint("SetTextI18n")
-    private fun launchRealTimePrice() {
-        lifecycleScope.launchWhenCreated {
-            Log.d(TAG, "Symbol is: ${bundle.getString("symbol")}")
-            val response = try {
-                bundle.getString("symbol")?.let {
-                    StockData.api.getPrice(it, apiKey)
-                }
-            } catch (e: IOException) {
-                Log.e(TAG, "IOException, you might not have internet connection")
-                return@launchWhenCreated
+    private suspend fun launchRealTimePrice(symbol: String) {
+        val priceResponse = apiManager.getPrice(symbol ,apiKey)
 
-            } catch (e: HttpException) {
-                Log.e(TAG, "HTTPException, unexpected response")
-                return@launchWhenCreated
-            }
-            if (response != null) {
-                if (response.isSuccessful && response.body() != null) {
-                    price = response.body()!!.price.toDouble()
-                    binding.tvCurrentPrice.text = price.toString()
-                }
-            }
+        price = priceResponse.toDouble()
+        withContext(Main) {
+            binding.tvCurrentPrice.text = price.toString()
         }
     }
 
